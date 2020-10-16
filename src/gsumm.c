@@ -680,6 +680,35 @@ SEXP gmean(SEXP x, SEXP narm)
   return(ans);
 }
 
+SEXP guniqueN(SEXP x)
+{
+  if (!isVectorAtomic(x)) error(_("GForce max can only be applied to columns, not .SD or similar. To find max of all items in a list such as .SD, either add the prefix base::max(.SD) or turn off GForce optimization using options(datatable.optimize=1). More likely, you may be looking for 'DT[,lapply(.SD,max),by=,.SDcols=]'"));
+  R_len_t i, j, ix, jx, thisgrp=0;
+  int n = (irowslen == -1) ? length(x) : irowslen;
+
+  SEXP ans;
+  if (nrow != n) error(_("nrow [%d] != length(x) [%d] in %s"), nrow, n, "gmin");
+  ans = PROTECT(allocVector(INTSXP, ngrp));
+  switch(TYPEOF(x)) {
+  case STRSXP:
+    for (i=0; i<ngrp; i++) INTEGER(ans)[i] = 1;
+    for (i=1; i<n; i++) {
+      thisgrp = grp[i];
+      if (thisgrp == grp[i-1]) {
+        ix = (irowslen == -1) ? i : irows[i]-1;
+        if (STRING_ELT(x, ix) != STRING_ELT(x, ix-1)) INTEGER(ans)[thisgrp]++;
+      }
+    }
+    break;
+  default:
+    error(_("Type '%s' not supported by GForce uniqueN (guniqueN). Either add the prefix data.table::uniqueN(.) or turn off GForce optimization using options(datatable.optimize=1)"), type2char(TYPEOF(x)));
+  }
+  copyMostAttrib(x, ans); // all but names,dim and dimnames. And if so, we want a copy here, not keepattr's SET_ATTRIB.
+  UNPROTECT(1);  // ans + maybe 1 coerced ans
+  // Rprintf(_("this gmin took %8.3f\n"), 1.0*(clock()-start)/CLOCKS_PER_SEC);
+  return(ans);
+}
+
 // gmin
 SEXP gmin(SEXP x, SEXP narm)
 {

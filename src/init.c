@@ -76,6 +76,7 @@ SEXP gsum();
 SEXP gmean();
 SEXP gmin();
 SEXP gmax();
+SEXP guniqueN();
 SEXP isOrderedSubset();
 SEXP setNumericRounding();
 SEXP getNumericRounding();
@@ -163,6 +164,7 @@ R_CallMethodDef callMethods[] = {
 {"Cgmean", (DL_FUNC) &gmean, -1},
 {"Cgmin", (DL_FUNC) &gmin, -1},
 {"Cgmax", (DL_FUNC) &gmax, -1},
+{"CguniqueN", (DL_FUNC) &guniqueN, -1},
 {"CisOrderedSubset", (DL_FUNC) &isOrderedSubset, -1},
 {"CsetNumericRounding", (DL_FUNC) &setNumericRounding, -1},
 {"CgetNumericRounding", (DL_FUNC) &getNumericRounding, -1},
